@@ -18,7 +18,7 @@ OpenAPI 规范（OAS），是定义一个标准的、与具体编程语言无关
 
 3. 生成代码
 ```sh
-openapi-generator generate -i ./resources/openapi.yaml -g go -t ./go -o ./golang-sdk/
+openapi-generator generate -i ./resources/openapi.yaml -g go -t ./go -o ./golang-sdk/ --package-name alipay
 ```
 
 > -i 参数指定 openapi 描述文件的路径
@@ -29,6 +29,7 @@ openapi-generator generate -i ./resources/openapi.yaml -g go -t ./go -o ./golang
 
 > -o 参数指定生成代码的输出路径
 
+> --package-name 参数指定生成代码的包名
 ## SDK 使用示例
 ### golang
 ```go

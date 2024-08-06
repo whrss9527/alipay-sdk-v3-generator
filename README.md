@@ -29,4 +29,85 @@ openapi-generator generate -i ./resources/openapi.yaml -g go -t ./go -o ./golang
 
 > -o 参数指定生成代码的输出路径
 
+## SDK 使用示例
+### golang
+```go
+package alipay
 
+import (
+	`bytes`
+	`context`
+	`fmt`
+	`testing`
+
+	sdk "github.com/whrss9527/go-alipay-sdk-v3"
+)
+
+const (
+	AppID = ""
+	PrivateKey = ``
+	PublicKey= ``
+)
+
+func Test_RequestPayment(t *testing.T) {
+	cfg := sdk.NewConfiguration()
+	cfg.Debug = true
+	cfg.AppID = AppID
+	cfg.PrivateKey = FormatPrivateKey(PrivateKey)
+	cfg.PublicKey = FormatPublicKey(PublicKey)
+	cfg.AppCertSN = ""
+	client := sdk.NewAPIClient(cfg)
+
+	ctx := context.Background()
+	result, resp, err := client.AlipayTradeAPI.AlipayTradePrecreate(ctx).AlipayTradePrecreateModel(sdk.AlipayTradePrecreateModel{
+		OutTradeNo:  sdk.PtrString("20150320010101002"),
+		TotalAmount: sdk.PtrString("0.1"),
+		Subject:     sdk.PtrString("Iphone6 16G"),
+		StoreId:     sdk.PtrString("NJ_001"),
+		ProductCode: sdk.PtrString("FACE_TO_FACE_PAYMENT"),
+	}).Execute()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("response: %+v\n", resp)
+	fmt.Printf("result: %+v\n", result)
+}
+
+func Test_QueryPayment(t *testing.T) {
+	cfg := sdk.NewConfiguration()
+	cfg.Debug = true
+	cfg.AppID = AppID
+	cfg.PrivateKey = FormatPrivateKey(PrivateKey)
+	cfg.PublicKey = FormatPublicKey(PublicKey)
+	cfg.AppCertSN = ""
+	client := sdk.NewAPIClient(cfg)
+
+	ctx := context.Background()
+	execute, response, err := client.AlipayTradeAPI.AlipayTradeQuery(ctx).AlipayTradeQueryModel(sdk.AlipayTradeQueryModel{
+		OutTradeNo: sdk.PtrString("20150320010101002"),
+	}).Execute()
+
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+	}
+	fmt.Printf("response: %+v\n", response)
+	fmt.Printf("result: %+v\n", execute)
+}
+
+func FormatPrivateKey(privateKey string) string {
+	var buffer bytes.Buffer
+	buffer.WriteString("-----BEGIN PRIVATE KEY-----\n")
+	buffer.WriteString(privateKey)
+	buffer.WriteString("\n-----END PRIVATE KEY-----")
+	return buffer.String()
+}
+
+func FormatPublicKey(publicKey string) string {
+	var buffer bytes.Buffer
+	buffer.WriteString("-----BEGIN PUBLIC KEY-----\n")
+	buffer.WriteString(publicKey)
+	buffer.WriteString("\n-----END PUBLIC KEY-----")
+	return buffer.String()
+}
+
+```

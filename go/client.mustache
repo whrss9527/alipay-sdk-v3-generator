@@ -287,6 +287,20 @@ type formFile struct {
 		formFileName string
 }
 
+func (c *APIClient) prepareConfig() error {
+    priKey, err := loadPrivateKey(c.cfg.PrivateKey)
+    if err != nil {
+       return fmt.Errorf("failed to get private key: %v", err)
+    }
+    publicKey, err := loadPublicKey(c.cfg.PublicKey)
+    if err != nil {
+        return fmt.Errorf("failed to get public key: %v", err)
+    }
+    c.cfg.privateKey = priKey
+    c.cfg.publicKey = publicKey
+    return nil
+}
+
 // prepareRequest build the request
 func (c *APIClient) prepareRequest(
 	ctx context.Context,

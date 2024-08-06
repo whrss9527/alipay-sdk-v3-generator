@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"crypto/rsa"
 )
 
 // contextKeys are used to identify the type of value in the context.
@@ -133,6 +134,8 @@ type Configuration struct {
 	AppCertSN string
 	PrivateKey string
 	PublicKey string
+	privateKey *rsa.PrivateKey
+	publicKey *rsa.PublicKey
 }
 
 // NewConfiguration returns a new Configuration object

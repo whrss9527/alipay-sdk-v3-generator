@@ -112,6 +112,10 @@ func (r *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#pathParams
 // Deprecated
 {{/isDeprecated}}
 func (a *{{{classname}}}Service) {{nickname}}Execute(r {{#structPrefix}}{{&classname}}{{/structPrefix}}{{^structPrefix}}Api{{/structPrefix}}{{operationId}}Request) ({{#returnType}}{{^isArray}}{{^returnTypeIsPrimitive}}{{^isResponseFile}}*{{/isResponseFile}}{{/returnTypeIsPrimitive}}{{/isArray}}{{{.}}}, {{/returnType}}*http.Response, error) {
+    err := a.client.prepareConfig()
+    if err != nil {
+        return {{#returnType}}nil, {{/returnType}}nil, &GenericOpenAPIError{error: err.Error()}
+    }
 	var (
 		localVarHTTPMethod   = http.Method{{httpMethod}}
 		localVarPostBody     interface{}
@@ -419,8 +423,6 @@ func (a *{{{classname}}}Service) {{nickname}}Execute(r {{#structPrefix}}{{&class
 func (a *{{{classname}}}Service) signRequest(req *http.Request) error {
 	appID := a.client.cfg.AppID
 	appCertSN := a.client.cfg.AppCertSN
-	privateKey := a.client.cfg.PrivateKey
-
 	nonce := generateUUID()
 	timestamp := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
 
@@ -455,7 +457,7 @@ func (a *{{{classname}}}Service) signRequest(req *http.Request) error {
 		content += appAuthToken + "\n"
 	}
 
-	signature, err := signWithRSA(content, privateKey)
+	signature, err := signWithRSA(content, a.client.cfg.privateKey)
 	if err != nil {
 		return err
 	}
@@ -473,9 +475,7 @@ func (a *{{{classname}}}Service) verifyResponse(resp *http.Response, body []byte
 		nonce + "\n" +
 		string(body) + "\n"
 
-	publicKey := a.client.cfg.PublicKey
-
-	return verifyWithRSA(content, sign, publicKey)
+	return verifyWithRSA(content, sign, a.client.cfg.publicKey)
 }
 
 {{/operations}}
